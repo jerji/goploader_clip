@@ -58,7 +58,7 @@ def main():
             print('text')
             name = 'text_' + str(datetime.datetime.now()) + '.txt'
             if validators.url(text) is True:
-                if text.startswith():
+                if 'paste.jouellet.net' in text:
                     print('Link already in clipboard')
                     return
                 text = '<!DOCTYPE html><meta http-equiv="refresh" content="0;url=' + text + '" />'
