@@ -1,9 +1,11 @@
 #!/usr/bin/python3
-import subprocess
 import datetime
+import os
 import requests
+import subprocess
 import validators
 
+basic_auth = True
 
 def run(bashCommand, stdin=None):
 
@@ -17,12 +19,17 @@ def run(bashCommand, stdin=None):
 def sendFile(file, name):
     s = requests.Session()
     s.headers = {'User-Agent': 'curl/angel'}
+    if basic_auth:
+        USER = os.getenv('GOP_USER')
+        PASSWORD = os.getenv('GOP_PASSWORD')
+        s.auth = (USER, PASSWORD)
     try:
-        result = s.post('http://172.16.0.3:8096/', files=dict(file=file, name=name))
+        result = s.post('https://paste.jouellet.net/add', files=dict(file=file, name=name))
     except:
         print('Server Error!')
         return None
     if result.status_code != 201:
+        print('Server Error!')
         return None
     if result.text is not None:
         run('xclip -selection clipboard -t text/plain -i', stdin=result.text.strip())
