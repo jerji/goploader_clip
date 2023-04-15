@@ -1,11 +1,13 @@
 #!/usr/bin/python3
 import datetime
+import dotenv
 import os
 import requests
 import subprocess
 import validators
 
 basic_auth = True
+dotenv.load_dotenv()
 
 def run(bashCommand, stdin=None):
 
@@ -26,10 +28,10 @@ def sendFile(file, name):
     try:
         result = s.post('https://paste.jouellet.net/add', files=dict(file=file, name=name))
     except:
-        print('Server Error!')
+        print('Server Error!', '-1')
         return None
     if result.status_code != 201:
-        print('Server Error!')
+        print('Server Error!', result.status_code)
         return None
     if result.text is not None:
         run('xclip -selection clipboard -t text/plain -i', stdin=result.text.strip())
@@ -68,6 +70,13 @@ def main():
                 if 'paste.jouellet.net' in text:
                     print('Link already in clipboard')
                     return
+                if '172.16.0.3:2342/api/v1/t' in text or 'photos.jouellet.net/api/v1/t' in text:
+                    parts = text.split('/')
+                    url = '/'.join(parts[:8]) + '/fit_7680'
+                    file = requests.get(url)
+                    sendFile(file.content, 'image.jpeg')
+                    return
+
                 text = '<!DOCTYPE html><meta http-equiv="refresh" content="0;url=' + text + '" />'
             sendFile(text.encode('utf-8'), name)
 
